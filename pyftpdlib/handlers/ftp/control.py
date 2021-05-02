@@ -7,6 +7,8 @@ import errno
 import glob
 import logging
 import os
+import random
+import re
 import socket
 import sys
 import time
@@ -1416,8 +1418,17 @@ class FTPHandler(AsyncChat):
         #   formats in which case we fall back on cwd as default.
         try:
             isdir = self.fs.isdir(path)
+            glob = None
+            if not isdir:
+                basedir, filename = os.path.split(path)
+                if '*' in filename and self.fs.isdir(basedir):
+                    isdir = True
+                    glob = filename.replace('.','\.').replace('*','.*')
+                    path = basedir
             if isdir:
                 listing = self.run_as_current_user(self.fs.listdir, path)
+                if glob:
+                    listing = [x for x in listing if re.match(glob, x)]
                 # RFC 959 recommends the listing to be sorted.
                 listing.sort()
                 iterator = self.fs.format_list(path, listing)
