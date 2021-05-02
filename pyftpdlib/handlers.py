@@ -710,6 +710,7 @@ class DTPHandler(AsyncChat):
         self._filefd = None
         self._idler = None
         self._initialized = False
+        self._readable_close_time = 0
         try:
             AsyncChat.__init__(self, sock, ioloop=cmd_channel.ioloop)
         except OSError as err:
@@ -943,7 +944,13 @@ class DTPHandler(AsyncChat):
         # upper IOLoop might end up calling readable() repeatedly,
         # hogging CPU resources.
         if not self.receive and not self._initialized:
-            return self.close()
+            if self._readable_close_time == 0:
+                self._readable_close_time = time.time_ns()
+            else:
+                elapsed = time.time_ns() - self._readable_close_time
+                if elapsed > 3000000:
+                    logger.warning('unexepcted readable time exceeded, running for ' + str(elapsed))
+                    return self.close()
         return self.receive
 
     def writable(self):
