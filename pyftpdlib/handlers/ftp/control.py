@@ -945,7 +945,7 @@ class DTPHandler(AsyncChat):
             else:
                 elapsed = time.time_ns() - self._readable_close_time
                 if elapsed > 3000000:
-                    logger.warning('unexepcted readable time exceeded, running for ' + str(elapsed))
+                    logger.warning(f'readable time exceeded, {elapsed} > 3ms')
                     return self.close()
         return self.receive
 
@@ -2317,7 +2317,7 @@ class FTPHandler(AsyncChat):
                 basedir, filename = os.path.split(path)
                 if '*' in filename and self.fs.isdir(basedir):
                     isdir = True
-                    glob = filename.replace('.','\.').replace('*','.*')
+                    glob = filename.replace('.', r'\.').replace('*', r'.*')
                     path = basedir
             if isdir:
                 listing = self.run_as_current_user(self.fs.listdir, path)
