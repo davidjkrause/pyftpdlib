@@ -12,6 +12,8 @@ import os
 import sys
 import textwrap
 
+from setuptools import find_packages
+
 WINDOWS = os.name == "nt"
 
 # Test deps, installable via `pip install .[test]`.
@@ -114,7 +116,7 @@ def main():
         author="Giampaolo Rodola'",
         author_email="g.rodola@gmail.com",
         url="https://github.com/giampaolo/pyftpdlib/",
-        packages=["pyftpdlib"],
+        packages=find_packages(),
         scripts=["scripts/ftpbench"],
         # fmt: off
         keywords=["ftp", "ftps", "server", "ftpd", "daemon", "python", "ssl",
